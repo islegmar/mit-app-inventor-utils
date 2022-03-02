@@ -7,7 +7,7 @@ silent=0
 tmpFile=/tmp/$(basename $0)
 dirOut=./data/out
 fileIn=./data/blocks.png
-fileOut=./doc.dpf
+fileOut=./doc.pdf
 doSplit=0
 doCompose=0
 
@@ -112,13 +112,19 @@ if [[ $doSplit -eq 1 ]]
 then
   [[ ! -d ${dirOut} ]] && mkdir -p ${dirOut}
   
-  ./split.sh -i $fileIn -d $dirOut
+  if [ $silent -eq 0 ]
+  then
+    ./split.sh -i $fileIn -d $dirOut
+  else
+    ./split.sh -s -i $fileIn -d $dirOut
+  fi
   echo "Image ${fileIn} splitted in ${dirOut}!"
 fi
 
 if [[ $doCompose -eq 1 ]]
 then
-  convert ${dirOut}/* ${fileOut}
+  [[ -f ${fileOut} ]] && rm ${fileOut}
+  convert ${dirOut}/*.png ${fileOut}
   echo "File ${fileOut} created!"
 fi
 
