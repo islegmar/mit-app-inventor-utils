@@ -2,7 +2,7 @@
 
 Utilities to be used with MIT App Inventor
 
-## Create a PDF document with the images
+# Create a PDF document with the images
 
 To run the scripts you need to have imagemagick installed. 
 
@@ -22,7 +22,7 @@ You can run both steps together with
 
     ./splitBlock -SC
 
-### Split the image
+## Split the image
 
 This process takes a while (be patient)
 
@@ -49,8 +49,25 @@ But in case you want to add more "loops" (at this moment this is not a parameter
 
 and change the `1` but the number steps you want.
 
-### Create the PDF
+## Create the PDF
 
 Just execute 
 
     ./splitBlock -C
+
+## Examples
+
+- [Initial Image](docs/blocks.png)
+- Images created
+  - [blocks-0.png](docs/out/blocks-0.png)
+  - [blocks-1.png](docs/out/blocks-1.png)
+  - [blocks-2.png](docs/out/blocks-2.png)
+  - [blocks-3.png](docs/out/blocks-3.png)
+  - [blocks-4.png](docs/out/blocks-4.png)
+  - [blocks-5.png](docs/out/blocks-5.png)
+  - [blocks-6.png](docs/out/blocks-6.png)
+  - [blocks-7.png](docs/out/blocks-7.png)
+  - [blocks-8.png](docs/out/blocks-8.png)
+  - [blocks-9.png](docs/out/blocks-9.png)
+  - [blocks-10.png](docs/out/blocks-10.png)
+- [PDF created](docs/out.pdf)
