@@ -12,7 +12,8 @@ dstDir=""
 doSplitOnce=0
 splitOnceMode="rows"
 
-tmpDir="/tmp/$(basename $0).$$"
+# tmpDir="/tmp/$(basename $0).$$"
+tmpDir="/tmp/$(basename $0)"
 inDir="$tmpDir/in"
 workDir="$tmpDir/work"
 debugDir="$tmpDir/debug"
@@ -156,6 +157,8 @@ function splitImg() {
   local _mode=$2
   local _dstDir=$3
 
+  trace "splitImg(image:${_image}, mode:${_mode}, dstDir:${_dstDir})"
+
   # Get the name of the image (without extension) and the extension.
   # They will be used to generate the name of the files produced
   local _imgName="$_dstDir/$(basename $_image|sed -e 's/\..*//')"
@@ -166,6 +169,8 @@ function splitImg() {
     rows) _str=$(getImageWC $_image "rows") ;;
     *)    _str=$(getImageWC $_image "cols") ;;
   esac
+
+  trace "_str:${_str}"
 
   # Make a copy or the image because we're goint to modify it
   local _myImg="$tmpDir/$(basename $image)"
@@ -306,54 +311,19 @@ EOD
     do
       trace "Processing $f..."
   
-      trace "Splitting in ROWS ..."
-  
-      # Split in rows
+      # Split in cols
+      trace "Splitting in COLS ..."
       rm $workDir/* 2>/dev/null
-      splitImg $f "rows" $workDir
-    
-      # Check if has generates new images
-      # For a strane reason diff says there are changes when not ..
-      changed=1
-    
-      if [[ $(ls -1 $workDir/*|wc -l) -eq 1 && "$(identify -format "%wx%h" $f)" == "$(identify -format "%wx%h" $workDir/*)" ]]
-      then
-        changed=0
-      fi
-    
-      if [ $changed -eq 1 ]
-      then
-        trace "[ROWS] : Generated $(ls -1 $workDir/*)"
-      # No Changes? Try Split H
-      else
-        trace "Split in COLS ..."
-  
-        rm $workDir/*
-        splitImg $f "cols" $workDir
-    
-        # Check if the image has changed
-        changed=1
-    
-        if [[ $(ls -1 $workDir/*|wc -l) -eq 1 && "$(identify -format "%wx%h" $f)" == "$(identify -format "%wx%h" $workDir/*)" ]]
-        then
-          changed=0
-        fi
-  
-        # No changes? Keep if
-        if [ $changed -eq 1 ]
-        then
-          trace "[COLS] : Generated $(ls -1 $workDir/*)"
-          trace "Generated new images split in columns!"
-        else
-          trace "Keeping image $workDir/*"
-          mv $workDir/* $dstDir
-        fi 
-      fi
-  
-      # Copy the files , we must process them
-      cp $workDir/* $inDir 2>/dev/null
-      # Remove the file
+      splitImg $f "cols" $workDir
       rm $f
+
+      # Now, remove the margins of all the files we have created
+      for new_file in $(ls -1 $workDir/* 2>/dev/null)
+      do
+        trace "Remove margins of ${new_file}..."
+        my_dst_file=${inDir}/$(basename ${new_file})
+        removeMargins "$new_file" ${my_dst_file}
+      done
     done # for files in inDir
 
     # Keep "what I have done" 
@@ -370,7 +340,7 @@ EOD
     # Split Once
     if [ $step -eq 1 ]
     then
-      cp $workDir/* $dstDir
+      cp ${inDir}/* $dstDir
       break
     fi
   

@@ -124,7 +124,20 @@ fi
 if [[ $doCompose -eq 1 ]]
 then
   [[ -f ${fileOut} ]] && rm ${fileOut}
-  convert ${dirOut}/*.png ${fileOut}
+  rm ${dirOut}/new_*.png 2>/dev/null
+  # TODO : this should be a parameter but let's suppose the final canvas is 
+  # an A4 8.27 × 11.69 inches with resolution 300 ppi (we leave some borders)
+  resolution=300
+  canvasW=$(echo "8.27*$resolution"|bc -l)
+  canvasH=$(echo "11.69*$resolution"|bc -l)
+  imageW=$(echo "${canvasW} * 0.95"|bc -l)
+  imageH=$(echo "${canvasH} * 0.95"|bc -l)
+  for f in $(find ${dirOut} -name '*.png')
+  do
+    convert $f{} -resize ${imageW}x${imageH} -background white -gravity center -extent ${canvasW}x${canvasH} ${dirOut}/new_$(basename $f) 
+  done
+
+  convert ${dirOut}/new_*.png ${fileOut}
   echo "File ${fileOut} created!"
 fi
 
